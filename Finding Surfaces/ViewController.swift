@@ -28,6 +28,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         sceneView.scene = scene
+        
+        sceneView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -35,6 +37,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        
+        configuration.planeDetection = [.horizontal]
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -49,6 +53,42 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     // MARK: - ARSCNViewDelegate
     
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
+        
+//        print(#function, planeAnchor)
+        
+        let floor = createFloor(planeAnchor: planeAnchor)
+        node.addChildNode(floor)
+        
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        guard let planeAnchor = anchor as? ARPlaneAnchor,
+            let floor = node.childNodes.first,
+            let geometry = floor.geometry as? SCNPlane
+            else { return }
+        geometry.width = CGFloat(planeAnchor.extent.x)
+        geometry.height = CGFloat(planeAnchor.extent.z)
+        
+        floor.position = SCNVector3(planeAnchor.center.x, 0, planeAnchor.center.z)
+        
+    }
+    
+    func createFloor(planeAnchor: ARPlaneAnchor) -> SCNNode {
+        let width = CGFloat(planeAnchor.extent.x)
+        let height = CGFloat(planeAnchor.extent.z)
+        
+        let geometry = SCNPlane(width: width, height: height)
+        
+        let node = SCNNode()
+        node.geometry = geometry
+        
+        node.opacity = 0.25
+        node.eulerAngles.x = -Float.pi / 2
+        
+        return node
+    }
 /*
     // Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
