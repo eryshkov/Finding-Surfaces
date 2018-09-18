@@ -60,6 +60,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         let floor = createFloor(planeAnchor: planeAnchor)
         node.addChildNode(floor)
+        createCube(to: node, width: 0.4)
         
     }
     
@@ -88,6 +89,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         node.eulerAngles.x = -Float.pi / 2
         
         return node
+    }
+    
+    func createCube(to node: SCNNode, width: CGFloat) {
+        let newNode = SCNNode()
+        
+        let geometry = SCNBox(width: width, height: width, length: width, chamferRadius: 0)
+        geometry.firstMaterial?.diffuse.contents = UIColor.green
+        newNode.opacity = 0.4
+        newNode.geometry = geometry
+        newNode.position = SCNVector3(newNode.position.x,
+                                      newNode.position.y + Float(width / 2),
+                                      newNode.position.z)
+        
+        node.addChildNode(newNode)
     }
 /*
     // Override to create and configure nodes for anchors added to the view's session.
