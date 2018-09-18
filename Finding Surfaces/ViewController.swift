@@ -56,7 +56,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
         
-//        print(#function, planeAnchor)
+        //        print(#function, planeAnchor)
         
         let floor = createFloor(planeAnchor: planeAnchor)
         node.addChildNode(floor)
